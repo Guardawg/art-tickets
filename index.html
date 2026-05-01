@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Art Tickets"/>
+<meta name="theme-color" content="#0f0f0f"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<title>Art Dept Tickets</title>
+<style>
+:root{
+  --bg:#0f0f0f;
+  --bg2:#1a1a1a;
+  --bg3:#242424;
+  --bg4:#2e2e2e;
+  --border:#333;
+  --border2:#444;
+  --text:#f0ede8;
+  --text2:#999;
+  --text3:#666;
+  --accent:#e8d5a3;
+  --accent2:#c4a96e;
+  --high:#e07070;
+  --high-bg:#2a1a1a;
+  --med:#e0b870;
+  --med-bg:#2a2010;
+  --low:#70c080;
+  --low-bg:#152015;
+  --safe-top:env(safe-area-inset-top, 0px);
+  --safe-bot:env(safe-area-inset-bottom, 0px);
+  --font:'DM Sans',sans-serif;
+  --mono:'DM Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);overscroll-behavior:none}
+body{display:flex;flex-direction:column;max-width:430px;margin:0 auto}
+
+.header{
+  padding:calc(var(--safe-top) + 14px) 20px 14px;
+  background:var(--bg);
+  border-bottom:0.5px solid var(--border);
+  position:sticky;top:0;z-index:10;
+  display:flex;align-items:center;gap:10px;
+}
+.header-title{font-size:17px;font-weight:500;letter-spacing:-.2px;flex:1}
+.header-sub{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:2px}
+.sort-btn{font-size:12px;color:var(--text2);padding:6px 10px;border:0.5px solid var(--border);border-radius:8px;background:none;cursor:pointer;font-family:var(--font)}
+
+.stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:var(--border);border-bottom:0.5px solid var(--border);
+}
+.stat{
+  background:var(--bg);padding:12px 0;text-align:center;
+}
+.stat-n{font-size:20px;font-weight:500;font-family:var(--mono);color:var(--accent)}
+.stat-l{font-size:10px;color:var(--text3);margin-top:2px;letter-spacing:.3px;text-transform:uppercase}
+
+.filters{
+  display:flex;gap:6px;padding:12px 16px;
+  overflow-x:auto;scrollbar-width:none;
+  border-bottom:0.5px solid var(--border);
+  -webkit-overflow-scrolling:touch;
+}
+.filters::-webkit-scrollbar{display:none}
+.pill{
+  flex-shrink:0;padding:5px 12px;border:0.5px solid var(--border);
+  border-radius:20px;font-size:12px;color:var(--text2);background:none;cursor:pointer;
+  font-family:var(--font);white-space:nowrap;transition:all .15s;
+}
+.pill.on{background:var(--accent);color:#0f0f0f;border-color:var(--accent);font-weight:500}
+
+.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+.add-btn-wrap{padding:12px 16px;border-bottom:0.5px solid var(--border);position:sticky;top:0}
+.add-btn{
+  width:100%;padding:12px;border:0.5px dashed var(--border2);border-radius:12px;
+  background:none;color:var(--text2);font-size:14px;font-family:var(--font);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:border-color .15s,color .15s;
+}
+.add-btn:active{border-color:var(--accent);color:var(--accent)}
+
+.ticket-list{padding:8px 0}
+.ticket{
+  margin:0 12px 8px;
+  border:0.5px solid var(--border);border-radius:14px;
+  background:var(--bg2);
+  overflow:hidden;
+  transition:opacity .2s;
+}
+.ticket.done{opacity:.4}
+.ticket-main{display:flex;align-items:flex-start;gap:12px;padding:14px}
+.chk{
+  width:22px;height:22px;border-radius:6px;
+  border:1.5px solid var(--border2);background:none;cursor:pointer;
+  flex-shrink:0;margin-top:1px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:transparent;transition:all .15s;
+}
+.chk.on{background:var(--low);border-color:var(--low);color:#0f0f0f}
+.ticket-body{flex:1;min-width:0}
+.ticket-row1{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:5px}
+.ticket-title{font-size:14px;font-weight:500;line-height:1.3;word-break:break-word}
+.ticket.done .ticket-title{text-decoration:line-through;color:var(--text3)}
+.badge{font-size:10px;padding:2px 7px;border-radius:10px;font-family:var(--mono);font-weight:500;white-space:nowrap}
+.bh{background:var(--high-bg);color:var(--high)}
+.bm{background:var(--med-bg);color:var(--med)}
+.bl{background:var(--low-bg);color:var(--low)}
+.bc{background:var(--bg3);color:var(--text2)}
+.ticket-desc{font-size:12px;color:var(--text2);line-height:1.5;word-break:break-word}
+.ticket-meta{font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)}
+.del-btn{padding:4px 8px;background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;line-height:1;flex-shrink:0;margin-top:-2px}
+.del-btn:active{color:var(--high)}
+
+.empty{padding:48px 24px;text-align:center;color:var(--text3);font-size:14px;line-height:1.7}
+.empty span{font-size:32px;display:block;margin-bottom:12px}
+
+.bottom-pad{height:calc(var(--safe-bot) + 8px)}
+
+/* Add sheet */
+.sheet-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:20;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.sheet-backdrop.open{opacity:1;pointer-events:all}
+.sheet{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);
+  width:100%;max-width:430px;
+  background:var(--bg2);border-radius:20px 20px 0 0;
+  border-top:0.5px solid var(--border2);
+  padding:0 0 calc(var(--safe-bot) + 16px);
+  z-index:21;transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.sheet.open{transform:translateX(-50%) translateY(0)}
+.sheet-handle{width:36px;height:4px;border-radius:2px;background:var(--border2);margin:12px auto 0}
+.sheet-title{font-size:15px;font-weight:500;padding:16px 20px 12px;border-bottom:0.5px solid var(--border)}
+.sheet-body{padding:16px 20px}
+.sheet-body textarea{
+  width:100%;height:100px;resize:none;
+  background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;
+  padding:10px 12px;font-size:14px;font-family:var(--font);color:var(--text);
+  outline:none;
+}
+.sheet-body textarea:focus{border-color:var(--accent)}
+.sheet-body textarea::placeholder{color:var(--text3)}
+.sheet-actions{display:flex;gap:8px;margin-top:12px}
+.s-btn{
+  flex:1;padding:13px;border-radius:10px;font-size:14px;font-family:var(--font);
+  cursor:pointer;border:none;font-weight:500;transition:opacity .15s;
+}
+.s-btn:active{opacity:.75}
+.s-ai{background:var(--accent);color:#0f0f0f}
+.s-manual{background:var(--bg4);color:var(--text);border:0.5px solid var(--border2)}
+.s-btn:disabled{opacity:.5;pointer-events:none}
+.spin{display:inline-block;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Sync indicator */
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--border2);flex-shrink:0;transition:background .3s}
+.sync-dot.ok{background:var(--low)}
+.sync-dot.err{background:var(--high)}
+.sync-dot.syncing{background:var(--med);animation:pulse .8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Settings sheet */
+.settings-btn{width:36px;height:36px;border:0.5px solid var(--border);border-radius:8px;background:none;color:var(--text2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.settings-sheet{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);
+  width:100%;max-width:430px;
+  background:var(--bg2);border-radius:20px 20px 0 0;
+  border-top:0.5px solid var(--border2);
+  padding:0 0 calc(var(--safe-bot) + 20px);
+  z-index:23;transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.settings-sheet.open{transform:translateX(-50%) translateY(0)}
+.field-lbl{font-size:12px;color:var(--text2);margin-bottom:6px;display:block}
+.field-input{
+  width:100%;padding:10px 12px;background:var(--bg3);
+  border:0.5px solid var(--border2);border-radius:10px;
+  font-size:13px;font-family:var(--mono);color:var(--text);outline:none;
+}
+.field-input:focus{border-color:var(--accent)}
+.field-input::placeholder{color:var(--text3)}
+.sync-status-row{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12px;color:var(--text2)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-title">Art Dept Tickets</div>
+    <div class="header-sub">TXSTATE · IT SUPPORT</div>
+  </div>
+  <div id="sync-dot" class="sync-dot" title="Sheets sync status"></div>
+  <select id="sort-sel" class="sort-btn">
+    <option value="newest">Newest</option>
+    <option value="priority">Priority</option>
+    <option value="open">Open first</option>
+  </select>
+  <button class="settings-btn" id="open-settings-btn" title="Settings">⚙</button>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<div class="filters" id="filters">
+  <button class="pill on" data-f="all">All</button>
+  <button class="pill" data-f="open">Open</button>
+  <button class="pill" data-f="done">Resolved</button>
+  <button class="pill" data-f="high">High priority</button>
+  <button class="pill" data-f="hardware">Hardware</button>
+  <button class="pill" data-f="software">Software</button>
+  <button class="pill" data-f="network">Network</button>
+  <button class="pill" data-f="account">Account</button>
+  <button class="pill" data-f="printer">Printer</button>
+  <button class="pill" data-f="other">Other</button>
+</div>
+
+<div class="scroll-area">
+  <div style="padding:12px 12px 4px">
+    <button class="add-btn" id="open-sheet-btn">
+      <span style="font-size:18px;line-height:1">+</span>
+      <span>New ticket</span>
+    </button>
+  </div>
+  <div class="ticket-list" id="ticket-list"></div>
+  <div class="bottom-pad"></div>
+</div>
+
+<!-- Sheet -->
+<div class="sheet-backdrop" id="backdrop"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">Add ticket</div>
+  <div class="sheet-body">
+    <textarea id="issue-input" placeholder="Paste email or describe the issue — AI will auto-categorize it"></textarea>
+    <div class="sheet-actions">
+      <button class="s-btn s-ai" id="ai-btn">✦ AI triage</button>
+      <button class="s-btn s-manual" id="manual-btn">Add manually</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Sheet -->
+<div class="sheet-backdrop" id="settings-backdrop"></div>
+<div class="settings-sheet" id="settings-sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">Google Sheets Sync</div>
+  <div class="sheet-body">
+    <label class="field-lbl">Apps Script Web App URL</label>
+    <input class="field-input" id="script-url-input" type="url" placeholder="https://script.google.com/macros/s/.../exec"/>
+    <div class="sync-status-row">
+      <div id="settings-sync-dot" class="sync-dot"></div>
+      <span id="sync-status-text">Not connected</span>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:8px">
+      <button class="s-btn s-ai" id="save-url-btn" style="flex:1">Save & test</button>
+      <button class="s-btn s-manual" id="sync-all-btn" style="flex:1">Sync all now</button>
+    </div>
+    <div style="margin-top:16px;padding:12px;background:var(--bg3);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.7">
+      <strong style="color:var(--text)">Setup (2 min):</strong><br>
+      1. Go to <strong style="color:var(--accent)">script.google.com</strong> → New project<br>
+      2. Paste the Apps Script code (see README)<br>
+      3. Click Deploy → New deployment → Web app<br>
+      4. Set "Who has access" to <strong style="color:var(--accent)">Anyone</strong><br>
+      5. Copy the web app URL and paste above
+    </div>
+  </div>
+</div>
+
+<script>
+const CATS=['hardware','software','network','account','printer','other'];
+const PRIOS=['high','medium','low'];
+let tickets=JSON.parse(localStorage.getItem('art_tix')||'[]');
+let filter='all',sortMode='newest';
+let idC=tickets.length?Math.max(...tickets.map(t=>t.id))+1:1;
+let scriptUrl=localStorage.getItem('sheets_url')||'';
+let syncQueue=new Set();
+
+function save(){try{localStorage.setItem('art_tix',JSON.stringify(tickets))}catch(e){}}
+
+// ---- Sheets sync ----
+function setSyncDot(state,text){
+  ['sync-dot','settings-sync-dot'].forEach(id=>{
+    const d=document.getElementById(id);
+    if(d){d.className='sync-dot'+(state?' '+state:'');}
+  });
+  const st=document.getElementById('sync-status-text');
+  if(st&&text)st.textContent=text;
+}
+
+async function syncTicket(ticket){
+  if(!scriptUrl)return;
+  setSyncDot('syncing');
+  try{
+    await fetch(scriptUrl,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({
+        action:'upsert',
+        ticket:{
+          id:ticket.id,
+          title:ticket.title,
+          desc:ticket.desc,
+          priority:ticket.priority,
+          category:ticket.category,
+          requester:ticket.requester||'',
+          status:ticket.done?'Resolved':'Open',
+          created:new Date(ticket.ts).toLocaleString(),
+          updated:new Date().toLocaleString()
+        }
+      })
+    });
+    setSyncDot('ok','Synced just now');
+  }catch(e){
+    setSyncDot('err','Sync failed — will retry');
+  }
+}
+
+async function syncAll(){
+  if(!scriptUrl||!tickets.length)return;
+  setSyncDot('syncing','Syncing all...');
+  try{
+    await fetch(scriptUrl,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({
+        action:'syncAll',
+        tickets:tickets.map(t=>({
+          id:t.id,title:t.title,desc:t.desc,
+          priority:t.priority,category:t.category,
+          requester:t.requester||'',
+          status:t.done?'Resolved':'Open',
+          created:new Date(t.ts).toLocaleString(),
+          updated:new Date().toLocaleString()
+        }))
+      })
+    });
+    setSyncDot('ok','All tickets synced');
+  }catch(e){
+    setSyncDot('err','Sync failed');
+  }
+}
+
+// Init sync dot
+if(scriptUrl)setSyncDot('ok','Connected');
+
+function ago(ts){
+  const d=(Date.now()-ts)/1000;
+  if(d<60)return 'just now';
+  if(d<3600)return Math.floor(d/60)+'m ago';
+  if(d<86400)return Math.floor(d/3600)+'h ago';
+  return Math.floor(d/86400)+'d ago';
+}
+
+function renderStats(){
+  const open=tickets.filter(t=>!t.done).length;
+  const high=tickets.filter(t=>!t.done&&t.priority==='high').length;
+  const done=tickets.filter(t=>t.done).length;
+  document.getElementById('stats').innerHTML=`
+    <div class="stat"><div class="stat-n">${open}</div><div class="stat-l">Open</div></div>
+    <div class="stat"><div class="stat-n">${high}</div><div class="stat-l">Urgent</div></div>
+    <div class="stat"><div class="stat-n">${done}</div><div class="stat-l">Done</div></div>
+    <div class="stat"><div class="stat-n">${tickets.length}</div><div class="stat-l">Total</div></div>
+  `;
+}
+
+function getVisible(){
+  let list=[...tickets];
+  if(filter==='open')list=list.filter(t=>!t.done);
+  else if(filter==='done')list=list.filter(t=>t.done);
+  else if(filter==='high')list=list.filter(t=>t.priority==='high'&&!t.done);
+  else if(CATS.includes(filter))list=list.filter(t=>t.category===filter);
+  const p={high:0,medium:1,low:2};
+  if(sortMode==='priority')list.sort((a,b)=>p[a.priority]-p[b.priority]);
+  else if(sortMode==='open')list.sort((a,b)=>a.done-b.done);
+  else list.sort((a,b)=>b.id-a.id);
+  return list;
+}
+
+function badgePrio(p){
+  if(p==='high')return '<span class="badge bh">high</span>';
+  if(p==='medium')return '<span class="badge bm">med</span>';
+  return '<span class="badge bl">low</span>';
+}
+
+function render(){
+  renderStats();
+  const list=getVisible();
+  const el=document.getElementById('ticket-list');
+  if(!list.length){
+    el.innerHTML='<div class="empty"><span>📋</span>No tickets here.<br>Tap "+ New ticket" to add one.</div>';
+    return;
+  }
+  el.innerHTML=list.map(t=>`
+    <div class="ticket${t.done?' done':''}" id="t${t.id}">
+      <div class="ticket-main">
+        <button class="chk${t.done?' on':''}" onclick="toggle(${t.id})" aria-label="mark resolved">${t.done?'✓':''}</button>
+        <div class="ticket-body">
+          <div class="ticket-row1">
+            <span class="ticket-title">${t.title}</span>
+          </div>
+          <div class="ticket-row1" style="margin-bottom:5px">
+            ${badgePrio(t.priority)}
+            <span class="badge bc">${t.category}</span>
+          </div>
+          <div class="ticket-desc">${t.desc}</div>
+          <div class="ticket-meta">#${t.id}${t.requester?' · '+t.requester:''} · ${ago(t.ts)}</div>
+        </div>
+        <button class="del-btn" onclick="del(${t.id})" aria-label="delete">×</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.toggle=id=>{const t=tickets.find(x=>x.id===id);if(t){t.done=!t.done;save();render();syncTicket(t);}};
+window.del=id=>{if(confirm('Delete this ticket?')){tickets=tickets.filter(x=>x.id!==id);save();render();}};
+
+// filters
+document.getElementById('filters').addEventListener('click',e=>{
+  const p=e.target.closest('.pill');if(!p)return;
+  document.querySelectorAll('.pill').forEach(x=>x.classList.remove('on'));
+  p.classList.add('on');filter=p.dataset.f;render();
+});
+document.getElementById('sort-sel').addEventListener('change',e=>{sortMode=e.target.value;render();});
+
+// sheet
+const sheet=document.getElementById('sheet');
+const backdrop=document.getElementById('backdrop');
+function openSheet(){sheet.classList.add('open');backdrop.classList.add('open');document.getElementById('issue-input').focus();}
+function closeSheet(){sheet.classList.remove('open');backdrop.classList.remove('open');}
+document.getElementById('open-sheet-btn').addEventListener('click',openSheet);
+backdrop.addEventListener('click',closeSheet);
+
+function addTicket(t){tickets.push(t);save();render();closeSheet();document.getElementById('issue-input').value='';syncTicket(t);}
+
+document.getElementById('manual-btn').addEventListener('click',()=>{
+  const desc=document.getElementById('issue-input').value.trim();
+  if(!desc)return;
+  addTicket({id:idC++,title:desc.slice(0,60)+(desc.length>60?'...':''),desc,priority:'medium',category:'other',done:false,ts:Date.now(),requester:''});
+});
+
+document.getElementById('ai-btn').addEventListener('click',async()=>{
+  const desc=document.getElementById('issue-input').value.trim();
+  if(!desc)return;
+  const btn=document.getElementById('ai-btn');
+  btn.innerHTML='<span class="spin">⟳</span> Analyzing...';
+  btn.disabled=true;
+  document.getElementById('manual-btn').disabled=true;
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:500,
+        system:`Tech support triage for Texas State University Art Department. Return ONLY valid JSON, no markdown, no backticks:
+{"title":"short summary max 60 chars sentence case","priority":"high|medium|low","category":"hardware|software|network|account|printer|other","requester":"name if found else empty string","notes":"1-2 sentence plain summary"}
+Priority: high=blocking/lab down/affects many; medium=single user workaround exists; low=non-urgent`,
+        messages:[{role:'user',content:desc}]
+      })
+    });
+    const data=await resp.json();
+    const raw=data.content.map(c=>c.text||'').join('');
+    const p=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    addTicket({
+      id:idC++,
+      title:p.title||desc.slice(0,60),
+      desc:p.notes||desc,
+      priority:PRIOS.includes(p.priority)?p.priority:'medium',
+      category:CATS.includes(p.category)?p.category:'other',
+      requester:p.requester||'',
+      done:false,ts:Date.now()
+    });
+  }catch(e){
+    addTicket({id:idC++,title:desc.slice(0,60),desc,priority:'medium',category:'other',done:false,ts:Date.now(),requester:''});
+  }
+  btn.innerHTML='✦ AI triage';
+  btn.disabled=false;
+  document.getElementById('manual-btn').disabled=false;
+});
+
+render();
+
+// settings sheet
+const settingsSheet=document.getElementById('settings-sheet');
+const settingsBackdrop=document.getElementById('settings-backdrop');
+function openSettings(){
+  settingsSheet.classList.add('open');
+  settingsBackdrop.classList.add('open');
+  document.getElementById('script-url-input').value=scriptUrl;
+}
+function closeSettings(){settingsSheet.classList.remove('open');settingsBackdrop.classList.remove('open');}
+document.getElementById('open-settings-btn').addEventListener('click',openSettings);
+settingsBackdrop.addEventListener('click',closeSettings);
+
+document.getElementById('save-url-btn').addEventListener('click',async()=>{
+  const url=document.getElementById('script-url-input').value.trim();
+  if(!url)return;
+  scriptUrl=url;
+  localStorage.setItem('sheets_url',url);
+  setSyncDot('syncing','Testing connection...');
+  await syncAll();
+});
+
+document.getElementById('sync-all-btn').addEventListener('click',()=>syncAll());
+
+// service worker
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
