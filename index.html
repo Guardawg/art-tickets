@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Art IT"/>
+<meta name="theme-color" content="#111"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="icon.png"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<title>Art Dept IT</title>
+<style>
+:root{
+  --bg:#111;--bg2:#1c1c1c;--bg3:#252525;--bg4:#2f2f2f;
+  --border:#2a2a2a;--border2:#3a3a3a;
+  --text:#f2efe9;--text2:#888;--text3:#555;
+  --gold:#d4a843;--gold2:#f0c060;
+  --red:#d46060;--red-bg:#251515;
+  --yellow:#d4a843;--yellow-bg:#251e0a;
+  --green:#60b87a;--green-bg:#0f2018;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bot:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;overscroll-behavior:none}
+body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:relative}
+
+/* ── HEADER ── */
+.hdr{
+  padding:calc(var(--safe-top) + 12px) 16px 12px;
+  background:var(--bg);border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:10;
+  display:flex;align-items:center;gap:8px;
+}
+.hdr-logo{
+  font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;
+  color:var(--gold);letter-spacing:1px;flex:1;
+}
+.hdr-logo span{color:var(--text3);}
+.hdr-btn{
+  width:32px;height:32px;border-radius:8px;
+  border:1px solid var(--border2);background:none;
+  color:var(--text2);font-size:15px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s,color .15s;
+}
+.hdr-btn:active{background:var(--bg3);color:var(--text)}
+
+/* ── STATS BAR ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border)}
+.stat{padding:10px 0;text-align:center;border-right:1px solid var(--border)}
+.stat:last-child{border-right:none}
+.stat-n{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:500;color:var(--gold)}
+.stat-l{font-size:9px;color:var(--text3);margin-top:2px;letter-spacing:.5px;text-transform:uppercase}
+
+/* ── FILTER TABS ── */
+.tabs{
+  display:flex;gap:0;border-bottom:1px solid var(--border);
+  overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex-shrink:0;padding:9px 14px;font-size:12px;font-weight:500;
+  color:var(--text3);background:none;border:none;cursor:pointer;
+  border-bottom:2px solid transparent;transition:all .15s;
+  font-family:'IBM Plex Sans',sans-serif;white-space:nowrap;
+}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* ── SCROLL AREA ── */
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+/* ── ADD BAR ── */
+.add-bar{padding:10px 12px;border-bottom:1px solid var(--border)}
+.add-row{display:flex;gap:8px}
+.add-input{
+  flex:1;height:40px;background:var(--bg2);border:1px solid var(--border2);
+  border-radius:8px;padding:0 12px;font-size:14px;
+  font-family:'IBM Plex Sans',sans-serif;color:var(--text);outline:none;
+}
+.add-input:focus{border-color:var(--gold)}
+.add-input::placeholder{color:var(--text3)}
+.add-ai-btn{
+  height:40px;padding:0 14px;border-radius:8px;border:1px solid var(--gold);
+  background:none;color:var(--gold);font-size:12px;font-weight:600;
+  font-family:'IBM Plex Mono',monospace;cursor:pointer;white-space:nowrap;
+  transition:background .15s;
+}
+.add-ai-btn:active{background:rgba(212,168,67,.1)}
+.add-ai-btn:disabled{opacity:.4;pointer-events:none}
+
+/* ── TICKET LIST ── */
+.tlist{padding:8px}
+.ticket{
+  border:1px solid var(--border);border-radius:10px;
+  background:var(--bg2);margin-bottom:6px;
+  display:flex;gap:0;overflow:hidden;
+  transition:opacity .2s;
+}
+.ticket.done{opacity:.35}
+.ticket-stripe{width:3px;flex-shrink:0}
+.stripe-high{background:var(--red)}
+.stripe-med{background:var(--yellow)}
+.stripe-low{background:var(--green)}
+.ticket-main{flex:1;padding:11px 12px;min-width:0}
+.ticket-top{display:flex;align-items:flex-start;gap:8px;margin-bottom:5px}
+.ticket-title{
+  font-size:14px;font-weight:500;flex:1;line-height:1.3;word-break:break-word;
+}
+.ticket.done .ticket-title{text-decoration:line-through;color:var(--text3)}
+.chk{
+  width:20px;height:20px;border-radius:5px;flex-shrink:0;
+  border:1.5px solid var(--border2);background:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:transparent;transition:all .15s;margin-top:1px;
+}
+.chk.on{background:var(--green);border-color:var(--green);color:#0f2018}
+.ticket-desc{font-size:12px;color:var(--text2);line-height:1.5;word-break:break-word}
+.ticket-footer{display:flex;align-items:center;gap:6px;margin-top:7px;flex-wrap:wrap}
+.badge{font-size:10px;padding:2px 6px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-weight:500}
+.badge-high{background:var(--red-bg);color:var(--red)}
+.badge-med{background:var(--yellow-bg);color:var(--yellow)}
+.badge-low{background:var(--green-bg);color:var(--green)}
+.badge-cat{background:var(--bg3);color:var(--text3)}
+.ticket-meta{font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;margin-left:auto}
+.del-btn{
+  padding:0 12px;background:none;border:none;border-left:1px solid var(--border);
+  color:var(--text3);font-size:16px;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;
+}
+.del-btn:active{color:var(--red);background:var(--red-bg)}
+
+.empty{padding:40px 20px;text-align:center;color:var(--text3);font-size:13px;line-height:1.8}
+.empty-icon{font-size:28px;display:block;margin-bottom:10px}
+.bot-pad{height:calc(var(--safe-bot) + 12px)}
+
+/* ── SHEET (add ticket) ── */
+.backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:20;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.backdrop.on{opacity:1;pointer-events:all}
+.sheet{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(102%);
+  width:100%;max-width:430px;z-index:21;
+  background:var(--bg2);border-radius:18px 18px 0 0;
+  border-top:1px solid var(--border2);
+  padding-bottom:calc(var(--safe-bot) + 16px);
+  transition:transform .28s cubic-bezier(.4,0,.2,1);
+}
+.sheet.on{transform:translateX(-50%) translateY(0)}
+.sheet-handle{width:32px;height:4px;border-radius:2px;background:var(--border2);margin:10px auto 0}
+.sheet-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px 10px;border-bottom:1px solid var(--border);
+}
+.sheet-hdr h2{font-size:15px;font-weight:500}
+.sheet-close{background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;line-height:1}
+.sheet-body{padding:16px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--text3);margin-bottom:6px;font-family:'IBM Plex Mono',monospace}
+.field input,.field select,.field textarea{
+  width:100%;padding:10px 12px;background:var(--bg3);
+  border:1px solid var(--border2);border-radius:8px;
+  font-size:14px;font-family:'IBM Plex Sans',sans-serif;
+  color:var(--text);outline:none;-webkit-appearance:none;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}
+.field input::placeholder,.field textarea::placeholder{color:var(--text3)}
+.field textarea{resize:none;height:80px;line-height:1.5}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sel-wrap{position:relative}
+.sel-wrap::after{content:'▾';position:absolute;right:11px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;font-size:12px}
+.sheet-btns{display:flex;gap:8px;margin-top:4px}
+.s-btn{
+  flex:1;height:44px;border-radius:9px;border:none;
+  font-size:14px;font-weight:600;font-family:'IBM Plex Sans',sans-serif;
+  cursor:pointer;transition:opacity .15s;
+}
+.s-btn:active{opacity:.75}
+.s-btn:disabled{opacity:.4;pointer-events:none}
+.s-primary{background:var(--gold);color:#111}
+.s-secondary{background:var(--bg4);color:var(--text);border:1px solid var(--border2)}
+
+/* ── SPIN ── */
+.spin{display:inline-block;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-logo">ART<span>/</span>IT <span>· TXSTATE</span></div>
+  <button class="hdr-btn" id="open-btn" title="Add ticket" style="font-size:18px;font-weight:300">+</button>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<div class="tabs" id="tabs">
+  <button class="tab on" data-f="all">All</button>
+  <button class="tab" data-f="open">Open</button>
+  <button class="tab" data-f="high">Urgent</button>
+  <button class="tab" data-f="done">Resolved</button>
+  <button class="tab" data-f="hardware">Hardware</button>
+  <button class="tab" data-f="software">Software</button>
+  <button class="tab" data-f="network">Network</button>
+  <button class="tab" data-f="printer">Printer</button>
+  <button class="tab" data-f="account">Account</button>
+</div>
+
+<div class="scroll">
+  <div class="tlist" id="tlist"></div>
+  <div class="bot-pad"></div>
+</div>
+
+<!-- Sheet -->
+<div class="backdrop" id="backdrop"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-hdr">
+    <h2>New Ticket</h2>
+    <button class="sheet-close" id="close-btn">×</button>
+  </div>
+  <div class="sheet-body">
+    <div class="field">
+      <label>Issue description</label>
+      <textarea id="f-desc" placeholder="Paste email or describe the problem…"></textarea>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Priority</label>
+        <div class="sel-wrap">
+          <select id="f-prio">
+            <option value="high">High</option>
+            <option value="medium" selected>Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Category</label>
+        <div class="sel-wrap">
+          <select id="f-cat">
+            <option value="hardware">Hardware</option>
+            <option value="software">Software</option>
+            <option value="network">Network</option>
+            <option value="printer">Printer</option>
+            <option value="account">Account</option>
+            <option value="other" selected>Other</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Requester (optional)</label>
+      <input type="text" id="f-req" placeholder="Name or email"/>
+    </div>
+    <div class="sheet-btns">
+      <button class="s-btn s-primary" id="ai-btn">✦ AI Triage</button>
+      <button class="s-btn s-secondary" id="manual-btn">Add</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CATS=['hardware','software','network','account','printer','other'];
+const PRIOS=['high','medium','low'];
+let tickets=JSON.parse(localStorage.getItem('tix')||'[]');
+let filter='all';
+let idC=tickets.length?Math.max(...tickets.map(t=>+t.id||0))+1:1;
+
+function save(){try{localStorage.setItem('tix',JSON.stringify(tickets))}catch(e){}}
+
+function ago(ts){
+  const d=(Date.now()-ts)/1000;
+  if(d<60)return 'now';
+  if(d<3600)return Math.floor(d/60)+'m';
+  if(d<86400)return Math.floor(d/3600)+'h';
+  return Math.floor(d/86400)+'d';
+}
+
+function renderStats(){
+  const open=tickets.filter(t=>!t.done).length;
+  const high=tickets.filter(t=>!t.done&&t.priority==='high').length;
+  const done=tickets.filter(t=>t.done).length;
+  document.getElementById('stats').innerHTML=`
+    <div class="stat"><div class="stat-n">${open}</div><div class="stat-l">Open</div></div>
+    <div class="stat"><div class="stat-n">${high}</div><div class="stat-l">Urgent</div></div>
+    <div class="stat"><div class="stat-n">${done}</div><div class="stat-l">Done</div></div>
+    <div class="stat"><div class="stat-n">${tickets.length}</div><div class="stat-l">Total</div></div>`;
+}
+
+function getVisible(){
+  let list=[...tickets];
+  if(filter==='open')list=list.filter(t=>!t.done);
+  else if(filter==='done')list=list.filter(t=>t.done);
+  else if(filter==='high')list=list.filter(t=>t.priority==='high'&&!t.done);
+  else if(CATS.includes(filter))list=list.filter(t=>t.category===filter);
+  return list.sort((a,b)=>{
+    if(a.done!==b.done)return a.done?1:-1;
+    const p={high:0,medium:1,low:2};
+    return (p[a.priority]||1)-(p[b.priority]||1);
+  });
+}
+
+function stripeClass(p){return p==='high'?'stripe-high':p==='medium'?'stripe-med':'stripe-low'}
+function badgeClass(p){return p==='high'?'badge-high':p==='medium'?'badge-med':'badge-low'}
+
+function render(){
+  renderStats();
+  const list=getVisible();
+  const el=document.getElementById('tlist');
+  if(!list.length){
+    el.innerHTML='<div class="empty"><span class="empty-icon">📋</span>No tickets here.<br>Tap + to add one.</div>';
+    return;
+  }
+  el.innerHTML=list.map(t=>`
+    <div class="ticket${t.done?' done':''}">
+      <div class="ticket-stripe ${stripeClass(t.priority)}"></div>
+      <div class="ticket-main">
+        <div class="ticket-top">
+          <div class="ticket-title">${t.title}</div>
+          <button class="chk${t.done?' on':''}" onclick="toggle(${t.id})">${t.done?'✓':''}</button>
+        </div>
+        ${t.desc?`<div class="ticket-desc">${t.desc}</div>`:''}
+        <div class="ticket-footer">
+          <span class="badge ${badgeClass(t.priority)}">${t.priority}</span>
+          <span class="badge badge-cat">${t.category}</span>
+          ${t.requester?`<span class="badge badge-cat">${t.requester}</span>`:''}
+          <span class="ticket-meta">#${t.id} · ${ago(t.ts)}</span>
+        </div>
+      </div>
+      <button class="del-btn" onclick="del(${t.id})">×</button>
+    </div>`).join('');
+}
+
+window.toggle=id=>{const t=tickets.find(x=>x.id===id);if(t){t.done=!t.done;save();render();}};
+window.del=id=>{if(confirm('Delete ticket?')){tickets=tickets.filter(x=>x.id!==id);save();render();}};
+
+// Tabs
+document.getElementById('tabs').addEventListener('click',e=>{
+  const tab=e.target.closest('.tab');if(!tab)return;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  tab.classList.add('on');filter=tab.dataset.f;render();
+});
+
+// Sheet open/close
+const sheet=document.getElementById('sheet');
+const backdrop=document.getElementById('backdrop');
+function openSheet(){sheet.classList.add('on');backdrop.classList.add('on');setTimeout(()=>document.getElementById('f-desc').focus(),300);}
+function closeSheet(){sheet.classList.remove('on');backdrop.classList.remove('on');}
+document.getElementById('open-btn').addEventListener('click',openSheet);
+document.getElementById('close-btn').addEventListener('click',closeSheet);
+backdrop.addEventListener('click',closeSheet);
+
+function makeTicket(title,desc,priority,category,requester){
+  return{id:idC++,title,desc,priority,category,requester:requester||'',done:false,ts:Date.now()};
+}
+
+function addAndClose(t){
+  tickets.push(t);save();render();closeSheet();
+  document.getElementById('f-desc').value='';
+  document.getElementById('f-prio').value='medium';
+  document.getElementById('f-cat').value='other';
+  document.getElementById('f-req').value='';
+}
+
+// Manual add
+document.getElementById('manual-btn').addEventListener('click',()=>{
+  const desc=document.getElementById('f-desc').value.trim();
+  if(!desc)return;
+  const prio=document.getElementById('f-prio').value;
+  const cat=document.getElementById('f-cat').value;
+  const req=document.getElementById('f-req').value.trim();
+  addAndClose(makeTicket(desc.slice(0,70)+(desc.length>70?'…':''),desc,prio,cat,req));
+});
+
+// AI triage
+document.getElementById('ai-btn').addEventListener('click',async()=>{
+  const desc=document.getElementById('f-desc').value.trim();
+  if(!desc)return;
+  const btn=document.getElementById('ai-btn');
+  btn.innerHTML='<span class="spin">⟳</span>';
+  btn.disabled=true;
+  document.getElementById('manual-btn').disabled=true;
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:400,
+        system:`Tech support triage for Texas State University Art Department. Return ONLY valid JSON, no markdown:
+{"title":"max 65 chars sentence case","priority":"high|medium|low","category":"hardware|software|network|account|printer|other","requester":"name if found else empty string","summary":"1 sentence plain description"}
+Priority: high=blocking work or lab down; medium=single user issue; low=non-urgent`,
+        messages:[{role:'user',content:desc}]
+      })
+    });
+    const data=await resp.json();
+    const raw=data.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
+    const p=JSON.parse(raw);
+    addAndClose(makeTicket(
+      p.title||desc.slice(0,70),
+      p.summary||desc,
+      PRIOS.includes(p.priority)?p.priority:'medium',
+      CATS.includes(p.category)?p.category:'other',
+      p.requester||document.getElementById('f-req').value.trim()
+    ));
+  }catch(e){
+    // fallback to manual
+    const desc2=document.getElementById('f-desc').value.trim();
+    if(desc2)addAndClose(makeTicket(desc2.slice(0,70),desc2,
+      document.getElementById('f-prio').value,
+      document.getElementById('f-cat').value,
+      document.getElementById('f-req').value.trim()));
+  }
+  btn.innerHTML='✦ AI Triage';
+  btn.disabled=false;
+  document.getElementById('manual-btn').disabled=false;
+});
+
+render();
+
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
