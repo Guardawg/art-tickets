@@ -353,6 +353,48 @@ async function syncAll(){
 // Init sync dot
 if(scriptUrl)setSyncDot('ok','Connected');
 
+// ---- Pull from sheet (two-way sync) ----
+async function pullFromSheet(){
+  if(!scriptUrl)return;
+  setSyncDot('syncing','Checking for new tickets...');
+  try{
+    const resp = await fetch(scriptUrl+'?action=getAll&t='+Date.now());
+    const data = await resp.json();
+    if(!data.success||!data.tickets||!data.tickets.length){
+      setSyncDot('ok','Up to date');
+      return;
+    }
+    let added=0;
+    data.tickets.forEach(st=>{
+      // skip if we already have this ticket by id
+      const exists=tickets.find(t=>String(t.id)===String(st.id));
+      if(!exists){
+        tickets.push({
+          id: st.id,
+          title: st.title,
+          desc: st.desc,
+          priority: ['high','medium','low'].includes(st.priority)?st.priority:'medium',
+          category: ['hardware','software','network','account','printer','other'].includes(st.category)?st.category:'other',
+          requester: st.requester||'',
+          done: st.done||st.status==='Resolved',
+          ts: st.ts||Date.now()
+        });
+        added++;
+      } else {
+        // update status if changed in sheet
+        if(st.done!==exists.done){
+          exists.done=st.done||st.status==='Resolved';
+        }
+      }
+    });
+    save();
+    render();
+    setSyncDot('ok', added>0?'Pulled '+added+' new ticket'+(added>1?'s':''):'Up to date');
+  }catch(e){
+    setSyncDot('err','Pull failed');
+  }
+}
+
 function ago(ts){
   const d=(Date.now()-ts)/1000;
   if(d<60)return 'just now';
@@ -509,9 +551,18 @@ document.getElementById('save-url-btn').addEventListener('click',async()=>{
   localStorage.setItem('sheets_url',url);
   setSyncDot('syncing','Testing connection...');
   await syncAll();
+  await pullFromSheet();
+  // Start auto-pull interval
+  setInterval(pullFromSheet, 60000);
 });
 
-document.getElementById('sync-all-btn').addEventListener('click',()=>syncAll());
+document.getElementById('sync-all-btn').addEventListener('click',async()=>{await syncAll();await pullFromSheet();});
+
+// Pull on load and every 60 seconds
+if(scriptUrl){
+  pullFromSheet();
+  setInterval(pullFromSheet, 60000);
+}
 
 // service worker
 if('serviceWorker' in navigator){

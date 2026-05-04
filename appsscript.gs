@@ -10,21 +10,20 @@ function getOrCreateSheet() {
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_NAME);
     sheet.appendRow(HEADERS);
-    // Style header row
     const headerRange = sheet.getRange(1, 1, 1, HEADERS.length);
     headerRange.setBackground('#1a1a2e');
     headerRange.setFontColor('#e8d5a3');
     headerRange.setFontWeight('bold');
     sheet.setFrozenRows(1);
-    sheet.setColumnWidth(1, 50);   // ID
-    sheet.setColumnWidth(2, 180);  // Title
-    sheet.setColumnWidth(3, 280);  // Description
-    sheet.setColumnWidth(4, 80);   // Priority
-    sheet.setColumnWidth(5, 90);   // Category
-    sheet.setColumnWidth(6, 120);  // Requester
-    sheet.setColumnWidth(7, 80);   // Status
-    sheet.setColumnWidth(8, 140);  // Created
-    sheet.setColumnWidth(9, 140);  // Updated
+    sheet.setColumnWidth(1, 50);
+    sheet.setColumnWidth(2, 180);
+    sheet.setColumnWidth(3, 280);
+    sheet.setColumnWidth(4, 80);
+    sheet.setColumnWidth(5, 90);
+    sheet.setColumnWidth(6, 120);
+    sheet.setColumnWidth(7, 80);
+    sheet.setColumnWidth(8, 140);
+    sheet.setColumnWidth(9, 140);
   }
   return sheet;
 }
@@ -32,7 +31,7 @@ function getOrCreateSheet() {
 function findRowById(sheet, id) {
   const data = sheet.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
-    if (String(data[i][0]) === String(id)) return i + 1; // 1-indexed
+    if (String(data[i][0]) === String(id)) return i + 1;
   }
   return -1;
 }
@@ -78,12 +77,9 @@ function doPost(e) {
     if (body.action === 'upsert') {
       upsertTicket(sheet, body.ticket);
     } else if (body.action === 'syncAll') {
-      // Clear existing data rows (keep header)
       const lastRow = sheet.getLastRow();
       if (lastRow > 1) sheet.deleteRows(2, lastRow - 1);
-      // Re-add all
       body.tickets.forEach(t => sheet.appendRow(ticketToRow(t)));
-      // Color rows
       body.tickets.forEach(t => colorRow(sheet, t));
     }
 
@@ -97,8 +93,43 @@ function doPost(e) {
   }
 }
 
-// Allow GET for connection testing
+// GET handler — connection test OR fetch all tickets for two-way sync
 function doGet(e) {
+  if (e && e.parameter && e.parameter.action === 'getAll') {
+    try {
+      const sheet = getOrCreateSheet();
+      const data = sheet.getDataRange().getValues();
+      if (data.length <= 1) {
+        return ContentService
+          .createTextOutput(JSON.stringify({ success: true, tickets: [] }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+      const tickets = data.slice(1).map(function(row) {
+        return {
+          id:        String(row[0]),
+          title:     String(row[1] || ''),
+          desc:      String(row[2] || ''),
+          priority:  String(row[3] || 'medium'),
+          category:  String(row[4] || 'other'),
+          requester: String(row[5] || ''),
+          status:    String(row[6] || 'Open'),
+          created:   String(row[7] || ''),
+          updated:   String(row[8] || ''),
+          done:      row[6] === 'Resolved',
+          ts:        new Date().getTime()
+        };
+      });
+      return ContentService
+        .createTextOutput(JSON.stringify({ success: true, tickets: tickets }))
+        .setMimeType(ContentService.MimeType.JSON);
+    } catch(err) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ success: false, error: err.toString() }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+
+  // Default: connection test
   return ContentService
     .createTextOutput(JSON.stringify({ status: 'Art Tickets sync active' }))
     .setMimeType(ContentService.MimeType.JSON);
