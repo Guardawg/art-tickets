@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="theme-color" content="#4a0000"/>
+<title>Submit a Tech Ticket — TxState Art Dept</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'IBM Plex Sans',sans-serif;
+  min-height:100vh;
+  background:linear-gradient(160deg,#3a0000,#5a0a00);
+  display:flex;flex-direction:column;align-items:center;
+  padding:24px 16px 48px;
+}
+.topbar{width:100%;max-width:500px;height:3px;background:linear-gradient(90deg,#c8a84b,#e0c068,#c8a84b);border-radius:2px;margin-bottom:32px}
+.header{text-align:center;margin-bottom:28px;width:100%;max-width:500px}
+.eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#c8a84b;font-weight:600;margin-bottom:10px}
+h1{font-size:26px;font-weight:600;color:#fdf8f0;margin-bottom:6px}
+.sub{font-size:14px;color:rgba(253,248,240,.55);font-weight:300}
+.card{
+  width:100%;max-width:500px;
+  background:#fdf8f0;border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,.4);
+}
+.card-top{height:3px;background:linear-gradient(90deg,#4a0000,#7a1515)}
+.card-body{padding:28px 28px 24px}
+@media(max-width:480px){.card-body{padding:22px 18px 20px}}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:440px){.row2{grid-template-columns:1fr}}
+.field{margin-bottom:18px}
+label{display:block;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#4a0000;margin-bottom:6px}
+.req{color:#9a2020;margin-left:2px}
+input,select,textarea{
+  width:100%;padding:10px 13px;
+  border:1.5px solid #ddd0c0;border-radius:8px;
+  font-size:15px;font-family:'IBM Plex Sans',sans-serif;
+  color:#1a0a0a;background:#fff;outline:none;
+  transition:border-color .15s,box-shadow .15s;
+  -webkit-appearance:none;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:#4a0000;
+  box-shadow:0 0 0 3px rgba(74,0,0,.08);
+}
+input::placeholder,textarea::placeholder{color:#bbb}
+textarea{resize:vertical;min-height:100px;line-height:1.6}
+.sel-wrap{position:relative}
+.sel-wrap::after{content:'▾';position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#4a0000;pointer-events:none;font-size:13px}
+.divider{height:1px;background:#e8ddd0;margin:22px 0}
+.submit{
+  width:100%;padding:14px;
+  background:linear-gradient(135deg,#4a0000,#6b0000);
+  color:#fdf8f0;border:none;border-radius:9px;
+  font-size:15px;font-weight:600;font-family:'IBM Plex Sans',sans-serif;
+  cursor:pointer;letter-spacing:.3px;
+  box-shadow:0 4px 14px rgba(74,0,0,.3);
+  transition:opacity .15s,transform .15s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.submit:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(74,0,0,.4)}
+.submit:active{opacity:.85;transform:none}
+.submit:disabled{opacity:.55;pointer-events:none}
+.gold{color:#c8a84b}
+.spin{display:inline-block;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Success */
+.success{display:none;text-align:center;padding:40px 28px}
+.success.show{display:block}
+.form-wrap.hide{display:none}
+.check-circle{
+  width:64px;height:64px;border-radius:50%;
+  background:linear-gradient(135deg,#4a0000,#7a1515);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;margin:0 auto 18px;
+  box-shadow:0 6px 20px rgba(74,0,0,.25);
+}
+.success h2{font-size:22px;font-weight:600;color:#1a0a0a;margin-bottom:8px}
+.success p{font-size:14px;color:#7a5a5a;line-height:1.6;margin-bottom:20px}
+.tnum{
+  display:inline-block;padding:8px 18px;
+  background:#4a0000;color:#c8a84b;
+  border-radius:7px;font-family:'IBM Plex Mono',monospace;
+  font-size:13px;letter-spacing:1px;margin-bottom:18px;
+}
+.again{
+  background:none;border:1.5px solid #ddd0c0;border-radius:8px;
+  padding:9px 20px;font-size:14px;color:#7a5a5a;
+  cursor:pointer;font-family:'IBM Plex Sans',sans-serif;
+  transition:border-color .15s,color .15s;
+}
+.again:hover{border-color:#4a0000;color:#4a0000}
+.footer{margin-top:20px;font-size:12px;color:rgba(253,248,240,.3);letter-spacing:.3px}
+</style>
+</head>
+<body>
+<div class="topbar"></div>
+<div class="header">
+  <div class="eyebrow">Texas State University · Art Department</div>
+  <h1>IT Support Request</h1>
+  <div class="sub">Fill out the form and we'll get back to you shortly.</div>
+</div>
+
+<div class="card">
+  <div class="card-top"></div>
+  <div class="card-body">
+    <div class="form-wrap" id="form-wrap">
+      <div class="row2">
+        <div class="field">
+          <label>Full Name<span class="req">*</span></label>
+          <input type="text" id="f-name" placeholder="Jane Smith" autocomplete="name"/>
+        </div>
+        <div class="field">
+          <label>Email<span class="req">*</span></label>
+          <input type="email" id="f-email" placeholder="jsmith@txstate.edu"/>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Room / Location<span class="req">*</span></label>
+          <input type="text" id="f-room" placeholder="e.g. FAB 210"/>
+        </div>
+        <div class="field">
+          <label>Device Type<span class="req">*</span></label>
+          <div class="sel-wrap">
+            <select id="f-device">
+              <option value="" disabled selected>Select…</option>
+              <option>Desktop Mac</option>
+              <option>Desktop PC</option>
+              <option>Laptop Mac</option>
+              <option>Laptop PC</option>
+              <option>Printer</option>
+              <option>Projector / Display</option>
+              <option>Scanner / Plotter</option>
+              <option>Network / WiFi</option>
+              <option>Software / Account</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="field" style="margin-bottom:0">
+        <label>Describe the Problem<span class="req">*</span></label>
+        <textarea id="f-desc" placeholder="What's happening? Any error messages? When did it start?"></textarea>
+      </div>
+      <button class="submit" id="submit-btn" style="margin-top:22px">
+        <span class="gold">✦</span>
+        <span id="btn-lbl">Submit Ticket</span>
+      </button>
+    </div>
+
+    <div class="success" id="success">
+      <div class="check-circle">✓</div>
+      <h2>Ticket Submitted!</h2>
+      <p>Your request has been logged. Our tech staff will be in touch soon.</p>
+      <div class="tnum" id="tnum">TICKET #00000</div><br/>
+      <button class="again" id="again-btn">Submit another issue</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">Art Department IT · Texas State University</div>
+
+<script>
+// Tickets are stored in localStorage so the manager app on the same domain can read them
+// If you want cross-device sync later, swap localStorage for a backend
+
+function getTickets(){
+  try{ return JSON.parse(localStorage.getItem('txstate_art_tickets')||'[]'); }
+  catch(e){ return []; }
+}
+function saveTickets(t){
+  try{ localStorage.setItem('txstate_art_tickets', JSON.stringify(t)); }catch(e){}
+}
+function catFromDevice(d){
+  if(!d)return'other';
+  d=d.toLowerCase();
+  if(d.includes('printer')||d.includes('scanner')||d.includes('plotter'))return'printer';
+  if(d.includes('network')||d.includes('wifi'))return'network';
+  if(d.includes('software')||d.includes('account'))return'account';
+  return'hardware';
+}
+
+let counter = getTickets().length ? Math.max(...getTickets().map(t=>t.id||0))+1 : 1000;
+
+document.getElementById('submit-btn').addEventListener('click',()=>{
+  const name  = document.getElementById('f-name').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const room  = document.getElementById('f-room').value.trim();
+  const dev   = document.getElementById('f-device').value;
+  const desc  = document.getElementById('f-desc').value.trim();
+  if(!name||!email||!room||!dev||!desc){
+    alert('Please fill in all fields.');return;
+  }
+  const btn=document.getElementById('submit-btn');
+  btn.disabled=true;
+  document.getElementById('btn-lbl').innerHTML='<span class="spin">⟳</span> Submitting…';
+
+  const id = ++counter;
+  const ticket = {
+    id, title:`${dev} issue — ${room}`,
+    desc, priority:'medium',
+    category: catFromDevice(dev),
+    requester:`${name} (${email})`,
+    room, email, device:dev,
+    done:false, ts:Date.now()
+  };
+  const tickets = getTickets();
+  tickets.push(ticket);
+  saveTickets(tickets);
+
+  document.getElementById('tnum').textContent = 'TICKET #'+String(id).padStart(5,'0');
+  document.getElementById('form-wrap').classList.add('hide');
+  document.getElementById('success').classList.add('show');
+});
+
+document.getElementById('again-btn').addEventListener('click',()=>{
+  document.getElementById('form-wrap').classList.remove('hide');
+  document.getElementById('success').classList.remove('show');
+  ['f-name','f-email','f-room','f-desc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-device').value='';
+  const btn=document.getElementById('submit-btn');
+  btn.disabled=false;
+  document.getElementById('btn-lbl').textContent='Submit Ticket';
+});
+</script>
+</body>
+</html>

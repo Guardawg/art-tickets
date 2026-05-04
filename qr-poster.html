@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>QR Poster — Art Dept IT</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:#e0d8cc;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;min-height:100vh;
+  padding:32px 16px;
+  font-family:'IBM Plex Sans',sans-serif;
+}
+.poster{
+  width:380px;
+  background:#4a0000;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 12px 48px rgba(0,0,0,.35);
+}
+.gold-top{height:6px;background:linear-gradient(90deg,#c8a84b,#e0c068,#c8a84b)}
+.body{padding:32px 28px 28px;text-align:center}
+.eyebrow{font-size:10px;letter-spacing:3.5px;text-transform:uppercase;color:#c8a84b;font-weight:600;margin-bottom:14px}
+h1{font-size:30px;font-weight:700;color:#fdf8f0;line-height:1.15;margin-bottom:6px}
+h1 span{color:#e0c068}
+.sub{font-size:13px;color:rgba(253,248,240,.5);font-weight:300;margin-bottom:24px;line-height:1.5}
+.divider{height:1px;background:rgba(200,168,75,.25);margin-bottom:24px}
+.qr-box{
+  background:#fdf8f0;
+  border-radius:12px;
+  padding:18px;
+  display:inline-block;
+  margin-bottom:20px;
+  box-shadow:0 4px 16px rgba(0,0,0,.2);
+}
+#qrcode{display:block}
+.scan{font-size:14px;font-weight:600;color:#c8a84b;margin-bottom:8px;letter-spacing:.3px}
+.url{font-size:11px;color:rgba(253,248,240,.4);word-break:break-all;line-height:1.5;font-family:monospace}
+.gold-bot{height:5px;background:linear-gradient(90deg,#c8a84b,#e0c068,#c8a84b);margin-top:28px}
+.print-btn{
+  margin-top:24px;padding:11px 28px;
+  background:#4a0000;color:#fdf8f0;
+  border:none;border-radius:8px;
+  font-size:14px;font-weight:600;font-family:'IBM Plex Sans',sans-serif;
+  cursor:pointer;letter-spacing:.3px;
+  box-shadow:0 4px 12px rgba(74,0,0,.3);
+}
+.print-btn:hover{background:#6b0000}
+@media print{
+  body{background:#fff;padding:0;min-height:auto}
+  .poster{box-shadow:none;border-radius:0;width:100%}
+  .print-btn{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="poster">
+  <div class="gold-top"></div>
+  <div class="body">
+    <div class="eyebrow">Texas State University</div>
+    <h1>Art Dept<br/><span>IT Support</span></h1>
+    <div class="sub">Having a tech issue?<br/>Scan to submit a ticket.</div>
+    <div class="divider"></div>
+    <div class="qr-box">
+      <div id="qrcode"></div>
+    </div>
+    <div class="scan">📱 Scan with your camera</div>
+    <div class="url" id="url-text"></div>
+    <div class="gold-bot"></div>
+  </div>
+</div>
+
+<button class="print-btn" onclick="window.print()">🖨 Print Poster</button>
+
+<script>
+const URL = 'https://guardawg.github.io/art-tickets/submit.html';
+document.getElementById('url-text').textContent = URL;
+new QRCode(document.getElementById('qrcode'), {
+  text: URL,
+  width: 220,
+  height: 220,
+  colorDark: '#4a0000',
+  colorLight: '#fdf8f0',
+  correctLevel: QRCode.CorrectLevel.H
+});
+</script>
+</body>
+</html>
