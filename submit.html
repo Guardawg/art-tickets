@@ -276,7 +276,7 @@ textarea{resize:vertical;min-height:110px;line-height:1.6}
 <script>
 // -------------------------------------------------------
 // PASTE YOUR APPS SCRIPT URL HERE:
-const SCRIPT_URL = 'https://script.google.com/macros/library/d/1hrXuF5dydsogXEVHW3Y9MsWdYjRT8jibrprLCWscMI_EltKadAwyMVuO/1';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzaN6egtUupiRzZJjsYEjUe1dyFVjSnUwlRfvMFo8QNlBrrXNaaSSpqSwX1uSHeF8bg/exec';
 // -------------------------------------------------------
 
 let ticketCount = Date.now() % 100000;
@@ -314,7 +314,7 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
   };
 
   try {
-    if (SCRIPT_URL && SCRIPT_URL !== 'https://script.google.com/macros/library/d/1hrXuF5dydsogXEVHW3Y9MsWdYjRT8jibrprLCWscMI_EltKadAwyMVuO/1') {
+    if (SCRIPT_URL && SCRIPT_URL !== 'https://script.google.com/macros/s/AKfycbzaN6egtUupiRzZJjsYEjUe1dyFVjSnUwlRfvMFo8QNlBrrXNaaSSpqSwX1uSHeF8bg/exec') {
       await fetch(SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
